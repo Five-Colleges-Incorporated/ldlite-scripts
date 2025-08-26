@@ -1,0 +1,6 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+
+./prepare_src > ../logs/`date "+%Y%m%d-%H%M"`.src_retries.log 2>&1
+
+ldpmarc -D /mnt/volume_nyc3_01/ldpmarc -f -v -u folio_read -M > ../logs/`date "+%Y%m%d-%H%M"`.ldpmarc.log 2>&1

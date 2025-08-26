@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+good=false
+try=0
+while [ $try -lt 5 ]; do
+    ((try++))
+    echo "Waiting to start attempt $try"
+    sleep 900
+
+    echo "Starting attempt $try"
+    # Because of how LDLite holds state and the streaming endpoint work
+    # normal LDLite retries don't work with source records.
+    # This is a temporary hack to add retries to the source records until
+    # LDLite can be made to retry them properly.
+    $(uv python find) src_download.py > ../logs/`date "+%Y%m%d-%H%M"`.$try.src.log 2>&1
+    ok=$?
+    if [ $ok -ne 0 ]; then
+        echo "Errored running ldlite... retrying"
+	continue
+    fi
+
+    echo "Checking attempt"
+    exists=$(psql -v "ON_ERROR_STOP=1" -AXqt < src_records_exists.sql)
+    ok=$?
+    if [ $ok -ne 0 ]; then
+        echo "Errored checking for existence... exiting"
+	exit $ok
+    fi
+    if [ $exists -eq 0 ]; then
+        echo "Table does not exist... retrying"
+	continue
+    fi
+
+    count=$(psql -v "ON_ERROR_STOP=1" -AXqt < src_records_full.sql)
+    ok=$?
+    if [ $ok -ne 0 ]; then
+        echo "Errored checking for count... exiting"
+	exit $ok
+    fi
+    if [ $count -lt 5000000 ]; then
+        echo "Only found $count rows... retrying"
+	continue
+    fi
+
+    echo "Attempt $try was good!"
+    good=true
+    break
+done
+
+if [ "$good" = false ]; then
+    echo "Exhausted attempts... exiting"
+    exit 1
+fi
+
+echo "Preparing for ldpmarc"
+/usr/bin/psql < alter_src_rec.sql > ../logs/`date "+%Y%m%d-%H%M"`.alter_src.log 2>&1
+

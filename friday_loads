@@ -1,0 +1,10 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+
+$(uv python find) ./items_load_id.py > ../logs/`date "+%Y%m%d-%H%M"`.items_id.log 2>&1 &
+$(uv python find) ./holdings_load_id.py > ../logs/`date "+%Y%m%d-%H%M"`.holdings_id.log 2>&1 &
+$(uv python find) ./instance_load_id.py > ../logs/`date "+%Y%m%d-%H%M"`.instance_id.log 2>&1 &
+./prepare_src > ../logs/`date "+%Y%m%d-%H%M"`.src_retries.log 2>&1 &
+
+wait
+ldpmarc -D /mnt/volume_nyc3_01/ldpmarc -f -v -u folio_read -M > ../logs/`date "+%Y%m%d-%H%M"`.ldpmarc.log 2>&1

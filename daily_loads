@@ -1,0 +1,22 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+
+# These have 1M+ records and take by far the longest so run them in parallel with the rest
+$(uv python find) ./circ_audit.py > ../logs/`date "+%Y%m%d-%H%M"`.circ_audit.log 2>&1 &
+$(uv python find) ./circ_checkin.py > ../logs/`date "+%Y%m%d-%H%M"`.circ_checkin.log 2>&1 &
+$(uv python find) ./circ_logs.py > ../logs/`date "+%Y%m%d-%H%M"`.circ_logs.log 2>&1 &
+
+
+# These take between 1-30 minutes each
+$(uv python find) ./inventory_load.py > ../logs/`date "+%Y%m%d-%H%M"`.inventory.log 2>&1
+$(uv python find) ./inv_plus_load.py  > ../logs/`date "+%Y%m%d-%H%M"`.inv_plus.log 2>&1
+$(uv python find) ./agree_load.py > ../logs/`date "+%Y%m%d-%H%M"`.agree.log 2>&1
+$(uv python find) ./circ_load.py > ../logs/`date "+%Y%m%d-%H%M"`.circ.log 2>&1
+$(uv python find) ./courses_load.py > ../logs/`date "+%Y%m%d-%H%M"`.courses.log 2>&1
+$(uv python find) ./fines_f_load.py > ../logs/`date "+%Y%m%d-%H%M"`.fines_f.log 2>&1
+$(uv python find) ./finance_load.py > ../logs/`date "+%Y%m%d-%H%M"`.finance.log 2>&1
+$(uv python find) ./orders_load.py > ../logs/`date "+%Y%m%d-%H%M"`.orders.log 2>&1
+$(uv python find) ./org_load.py > ../logs/`date "+%Y%m%d-%H%M"`.org.log 2>&1
+$(uv python find) ./user_load.py > ../logs/`date "+%Y%m%d-%H%M"`.user.log 2>&1
+
+wait
