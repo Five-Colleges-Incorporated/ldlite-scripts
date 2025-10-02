@@ -20,7 +20,7 @@ db = ld.connect_db_postgresql(dsn=f"""
 """)
 
 queries = [
-    ('folio_source_record.records', '/source-storage')
+    ('folio_source_record.records', '/source-storage/source-records')
     ]
 
 tables = []

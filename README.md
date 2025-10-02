@@ -27,7 +27,7 @@ Note, this assumes you've access to a linux server setup more or less normally a
 
 1. Create an ldlite directory, we've conventionally used `ldlite-<version>` as the naming convention to be able to compare multiple LDLite versions.
 1. [Install UV](https://docs.astral.sh/uv/getting-started/installation/), an extremely fast Python package and project manager written in Rust. Note, you can use any python environment manager by modifying the scripts accordingly. UV is just the simplest we've found.
-1. In the directory created in 1. run `uv init` and `uv add ldlite==<version>`.
+1. In the directory created in 1. run `uv init` and `uv pip install psycopg[c] ldlite==version`.
 1. Copy or git clone this repository into the ldlite directory and name it `scripts`.
 1. Create a `logs` directory in the ldlite directory.
 1. Run crontab -e and add the cron jobs from the crontab file in this repository.
